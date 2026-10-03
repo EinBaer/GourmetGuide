@@ -1,0 +1,4 @@
+node_modules/
+.env
+# Lokale Daten (User, Kochbuch, Empfehlungen) gehoeren nicht ins Repository
+backend/src/data/*.json
