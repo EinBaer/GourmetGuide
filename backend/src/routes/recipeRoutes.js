@@ -4,7 +4,7 @@ const router = express.Router();
 const { authenticate } = require('../middleware/authMiddleware');
 const { loadRecipeDatabase, saveRecipeDatabase, loadFeaturedDatabase } = require('../utils/dbManager');
 const { searchRecipes, getRecipeDetails, getSubstitutes } = require('../utils/spoonacular');
-const { toEnglish, suggestSearch } = require('../utils/translations');
+const { toEnglish } = require('../utils/translations');
 
 // Allowlists: nur diese Werte werden an Spoonacular weitergegeben
 const ALLOWED_CUISINES = [
@@ -43,13 +43,21 @@ router.get('/search', async (req, res) => {
     return res.status(400).json({ error: `Search term must be at most ${MAX_TERM_LENGTH} characters.` });
   }
 
-  // "Reis, Hähnchen,  ,paprika" -> ['rice', 'chicken', 'bell pepper']
-  const ingredients = ingredientText
-    ? [...new Set(ingredientText.split(/,| and | und /i).map(toEnglish).filter(Boolean))]
-    : null;
+  // "Reis, Haehnchen, paprika" -> ['rice', 'chicken', 'bell pepper'], Duplikate werden uebersprungen
+  let ingredients = null;
+  if (ingredientText) {
+    ingredients = [];
+    ingredientText.split(',').forEach((part) => {
+      const term = toEnglish(part.trim());
+      if (term && !ingredients.includes(term)) ingredients.push(term);
+    });
+  }
 
-  if (ingredients && (ingredients.length > MAX_INGREDIENTS || ingredients.some((term) => term.length > MAX_TERM_LENGTH))) {
+  if (ingredients && ingredients.length > MAX_INGREDIENTS) {
     return res.status(400).json({ error: `Please enter at most ${MAX_INGREDIENTS} ingredients.` });
+  }
+  if (ingredients && ingredients.some((term) => term.length > MAX_TERM_LENGTH)) {
+    return res.status(400).json({ error: `Each ingredient must be at most ${MAX_TERM_LENGTH} characters.` });
   }
   if (cuisine && !ALLOWED_CUISINES.includes(cuisine)) {
     return res.status(400).json({ error: 'Unknown cuisine filter.' });
@@ -64,9 +72,7 @@ router.get('/search', async (req, res) => {
   try {
     const englishQuery = query ? toEnglish(query) : '';
     const results = await searchRecipes({ query: englishQuery, ingredients, cuisine, diet, maxReadyTime });
-    // Nur bei 0 Treffern einen Vorschlag berechnen, das kostet keine API-Punkte
-    const suggestion = results.length ? null : suggestSearch({ query: englishQuery, ingredients });
-    return res.json({ results, ingredients, suggestion });
+    return res.json({ results });
   } catch (error) {
     console.error('Recipe search error:', error.message);
     const message = error.status === QUOTA_STATUS ? QUOTA_MESSAGE : 'Recipe search failed. Please try again later.';
@@ -76,12 +82,13 @@ router.get('/search', async (req, res) => {
 
 // MUST 1, MUST 6: GET /details/:id liefert Rezeptdetails inkl. Naehrwerte (kein Login noetig)
 router.get('/details/:id', async (req, res) => {
-  if (!/^\d+$/.test(req.params.id)) {
+  const recipeId = Number(req.params.id);
+  if (!Number.isInteger(recipeId) || recipeId <= 0) {
     return res.status(400).json({ error: 'Invalid recipe ID.' });
   }
 
   try {
-    const details = await getRecipeDetails(req.params.id);
+    const details = await getRecipeDetails(recipeId);
     if (!details) {
       return res.status(404).json({ error: 'Recipe not found.' });
     }
