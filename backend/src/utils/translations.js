@@ -86,38 +86,6 @@ const toEnglish = (term) => {
   return GERMAN_TO_ENGLISH[normalized] || normalized;
 };
 
-// ---------- Rechtschreibhilfe "Did you mean ...?" ----------
-
-const DISHES = [
-  'lasagna', 'risotto', 'curry', 'pancakes', 'pizza', 'burger', 'tacos', 'burrito', 'paella', 'ramen',
-  'sushi', 'pad thai', 'schnitzel', 'goulash', 'carbonara', 'bolognese', 'chili', 'soup', 'salad', 'omelette',
-  'quiche', 'falafel', 'hummus', 'tiramisu', 'brownies', 'cheesecake', 'gnocchi', 'moussaka', 'biryani',
-  'butter chicken', 'pho', 'enchiladas', 'meatballs', 'fried rice', 'apple pie', 'banana bread'
-];
-const INGREDIENTS = [...new Set(Object.values(GERMAN_TO_ENGLISH))];
-// Hoechstens 2 Tippfehler, bei kurzen Woertern weniger (1 Fehler pro 3 Buchstaben)
-const MAX_TYPOS = 2;
-
-// Levenshtein-Distanz: wie viele Buchstaben muss man einfuegen, loeschen oder tauschen
-const distance = (a, b) => {
-  let previous = Array.from({ length: b.length + 1 }, (_, j) => j);
-  for (let i = 1; i <= a.length; i++) {
-    const current = [i];
-    for (let j = 1; j <= b.length; j++) {
-      current[j] = Math.min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-    }
-    previous = current;
-  }
-  return previous[b.length];
-};
-
-// Aehnlichstes bekanntes Wort, deutsche Treffer werden gleich uebersetzt
-const closestWord = (term, words) => {
-  const best = words.reduce((winner, word) => (distance(term, word) < distance(term, winner) ? word : winner));
-  if (distance(term, best) > Math.min(MAX_TYPOS, Math.floor(term.length / 3))) return term;
-  return GERMAN_TO_ENGLISH[best] || best;
-};
-
 // Liefert einen Vorschlag oder null, wenn nichts zu korrigieren ist
 const suggestSearch = ({ query, ingredients }) => {
   const suggestion = ingredients
@@ -127,4 +95,4 @@ const suggestSearch = ({ query, ingredients }) => {
   return suggestion === original ? null : suggestion;
 };
 
-module.exports = { toEnglish, suggestSearch };
+module.exports = { toEnglish };
