@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { loadUserDatabase } = require('../utils/dbManager');
 
-// MUST 4: prueft den Authorization-Header, verifiziert das JWT und setzt req.user
+// MUST 4: Prueft den Bearer-Token und speichert die Token-Daten in req.user
 const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -10,10 +10,11 @@ const authenticate = (req, res, next) => {
   }
 
   try {
-    req.user = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET, { algorithms: ['HS256'] });
+    const token = authHeader.split(' ')[1];
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Your session has expired. Please log in again.' });
+    return res.status(401).json({ error: 'Invalid or expired token. Please log in again.' });
   }
 };
 
