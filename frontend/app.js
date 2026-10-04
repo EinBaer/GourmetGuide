@@ -75,11 +75,9 @@ let shownCount = 0;
 let unitSystem = 'metric';
 let currentServings = 0;
 
-// ---------- Helper ----------
-
 // Zentraler fetch-Helper: haengt das JWT an und wirft bei Fehlern die Server-Meldung
 const requestJson = async (path, options = {}) => {
-  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  const headers = { 'Content-Type': 'application/json' };
   if (currentToken) headers.Authorization = `Bearer ${currentToken}`;
 
   const response = await fetch(`${API_URL}${path}`, { ...options, headers });
@@ -111,11 +109,13 @@ const formatDate = (isoString) => new Date(isoString).toLocaleDateString('en-GB'
   year: 'numeric'
 });
 
-const createDietTags = (recipe) => [
-  recipe.vegetarian && 'Vegetarian',
-  recipe.vegan && 'Vegan',
-  recipe.glutenFree && 'Gluten-free'
-].filter(Boolean).map((tag) => `<span class="diet-tag">${tag}</span>`).join('');
+const createDietTags = (recipe) => {
+  let tags = '';
+  if (recipe.vegetarian) tags += '<span class="diet-tag">Vegetarian</span>';
+  if (recipe.vegan) tags += '<span class="diet-tag">Vegan</span>';
+  if (recipe.glutenFree) tags += '<span class="diet-tag">Gluten-free</span>';
+  return tags;
+};
 
 const findCookbookEntry = (recipeId) => cookbookEntries.find((entry) => entry.recipeId === recipeId);
 
@@ -195,8 +195,6 @@ const switchTab = (tabName) => {
   if (tabName === 'admin') loadAdmin();
 };
 
-// ---------- Rezeptkarten ----------
-
 const getCardMeta = (recipe) => {
   if (recipe.dateAdded) {
     const ratingText = recipe.rating ? `${recipe.rating}/5 stars` : 'Not rated yet';
@@ -219,8 +217,8 @@ const createRecipeCard = (recipe) => {
   card.innerHTML = `
     <div class="card-media">
       ${recipe.image
-        ? `<img src="${escapeHtml(recipe.image)}" alt="" loading="lazy">`
-        : '<div class="image-placeholder" aria-hidden="true"></div>'}
+      ? `<img src="${escapeHtml(recipe.image)}" alt="" loading="lazy">`
+      : '<div class="image-placeholder" aria-hidden="true"></div>'}
       ${timeBadge}
     </div>
     <div class="recipe-card-body">
@@ -254,7 +252,7 @@ const showNextRecipes = () => {
 const loadFeatured = async () => {
   try {
     const data = await requestJson('/recipes/featured');
-    renderRecipes(featuredList, data.featured.map((entry) => ({ ...entry, id: entry.recipeId })));
+    renderRecipes(featuredList, data.featured);
     // Ohne Empfehlungen bleibt der ganze Bereich weg statt eines leeren Kastens
     featuredSection.hidden = data.featured.length === 0;
   } catch (error) {
@@ -440,10 +438,12 @@ const renderPortions = (recipe, servings) => {
   const factor = servings / recipe.servings;
   const substituteButton = currentUser ? '<button class="link-button substitute-button" type="button">Substitutes</button>' : '';
 
+
   modalBody.querySelector('#ingredientList').innerHTML = recipe.ingredients.map((ing) => {
     const measure = ing[unitSystem];
-    // Einheit weglassen, wenn es keine gibt (z.B. "2 egg")
-    const amountText = [formatAmount(measure.amount * factor), measure.unit].filter(Boolean).join(' ');
+    // Einheit weglassen, wenn es keine gibt
+    const amount = formatAmount(measure.amount * factor);
+    const amountText = measure.unit ? `${amount} ${measure.unit}` : `${amount}`;
     return `
       <li data-ingredient="${escapeHtml(ing.name)}">
         <span><strong>${escapeHtml(amountText)}</strong> ${escapeHtml(ing.name)}</span>
@@ -479,9 +479,11 @@ const formatSubstitute = (raw) => {
 
 const createSubstituteBox = (substitutes, emptyText = 'No substitutes known for this ingredient.') => {
   // Doppelte Vorschlaege entfernen, hoechstens MAX_SUBSTITUTES anzeigen
-  const unique = [...new Map(substitutes.map(formatSubstitute)
-    .map((entry) => [entry.text.toLowerCase(), entry])).values()]
-    .slice(0, MAX_SUBSTITUTES);
+  const unique = [];
+  substitutes.map(formatSubstitute).forEach((entry) => {
+    const exists = unique.some((saved) => saved.text.toLowerCase() === entry.text.toLowerCase());
+    if (!exists && unique.length < MAX_SUBSTITUTES) unique.push(entry);
+  });
 
   const box = document.createElement('div');
   box.className = 'substitute-box';
@@ -687,19 +689,6 @@ searchModeInputs.forEach((input) => input.addEventListener('change', () => {
   searchInput.focus();
 }));
 
-// 0 Treffer: Vorschlag als Button anzeigen, ein Klick sucht direkt nach dem korrigierten Begriff
-const showNoResults = (suggestion) => {
-  if (!suggestion) {
-    searchResults.innerHTML = '<p class="status">No recipes found. Try fewer filters or another term.</p>';
-    return;
-  }
-  searchResults.innerHTML = `<p class="status">No recipes found. Did you mean <button class="link-button" type="button">${escapeHtml(suggestion)}</button>?</p>`;
-  searchResults.querySelector('button').addEventListener('click', () => {
-    searchInput.value = suggestion;
-    searchForm.requestSubmit();
-  });
-};
-
 searchForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -720,7 +709,9 @@ searchForm.addEventListener('submit', async (event) => {
     shownCount = 0;
     searchResults.innerHTML = '';
     showNextRecipes();
-    if (!foundRecipes.length) showNoResults(data.suggestion);
+    if (!foundRecipes.length) {
+      searchResults.innerHTML = '<p class="status">No recipes found. Try fewer filters or another term.</p>';
+    }
   } catch (error) {
     searchResults.innerHTML = `<p class="status">${escapeHtml(error.message)}</p>`;
   } finally {
@@ -730,14 +721,6 @@ searchForm.addEventListener('submit', async (event) => {
 
 showMoreButton.addEventListener('click', showNextRecipes);
 
-// Spotlight-Effekt: Mausposition als CSS-Variable an die Karte geben, den Rest macht CSS
-document.addEventListener('pointermove', (event) => {
-  const card = event.target.closest('.recipe-card');
-  if (!card) return;
-  const rect = card.getBoundingClientRect();
-  card.style.setProperty('--x', `${event.clientX - rect.left}px`);
-  card.style.setProperty('--y', `${event.clientY - rect.top}px`);
-});
 authSwitch.addEventListener('click', toggleAuthMode);
 loginButton.addEventListener('click', () => showAuthPanel(true));
 guestButton.addEventListener('click', () => showAuthPanel(false));
@@ -765,7 +748,10 @@ document.addEventListener('keydown', (event) => {
 // Gespeichertes Token vom Server pruefen lassen (abgelaufen? Rolle geaendert?)
 const initApp = async () => {
   const savedToken = localStorage.getItem(TOKEN_KEY);
-  if (!savedToken) return setLoggedOut();
+  if (!savedToken) {
+    setLoggedOut();
+    return;
+  }
 
   currentToken = savedToken;
   try {
