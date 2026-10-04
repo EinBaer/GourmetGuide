@@ -68,7 +68,7 @@ textarea {
   font: inherit;
 }
 
-/* Dunkle Schrift auf Orange: deutlich besserer Kontrast als Weiss (WCAG) */
+/* Dunkle Schrift auf hellem Lila: besserer Kontrast als Weiss (WCAG) */
 button {
   border: 0;
   border-radius: 10px;
@@ -197,7 +197,7 @@ label {
   justify-content: space-between;
   gap: 16px;
   padding: 14px 24px;
-  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  background: rgba(17, 13, 23, 0.8);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(12px);
 }
@@ -307,7 +307,7 @@ label {
 
 /* ---------- Tabs ---------- */
 
-/* Schlanke Links: der aktive Tab bekommt eine orange Linie darunter */
+/* Schlanke Links: der aktive Tab bekommt eine Linie in der Primaerfarbe darunter */
 .tab-button {
   position: relative;
   background: transparent;
@@ -409,6 +409,7 @@ label {
   color: var(--text);
   cursor: pointer;
   padding: 6px 14px;
+  transition: background 0.2s, color 0.2s;
 }
 
 /* Radio bleibt klick- und tastaturbedienbar, liegt aber unsichtbar ueber dem Label */
@@ -420,10 +421,6 @@ label {
   margin: 0;
   opacity: 0;
   cursor: pointer;
-}
-
-.mode-switch label {
-  transition: background 0.2s, color 0.2s;
 }
 
 .mode-switch label:has(input:checked) {
@@ -454,7 +451,7 @@ label {
 }
 
 /* Meldungen im Grid ueber alle Spalten statt nur in der ersten */
-.recipe-grid > .status {
+.recipe-grid>.status {
   grid-column: 1 / -1;
 }
 
@@ -470,26 +467,10 @@ label {
   animation: fade-up 0.5s var(--ease) both;
 }
 
-/* Spotlight: Lichtkegel an der Mausposition (--x/--y setzt app.js) */
-.recipe-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: radial-gradient(320px circle at var(--x, 50%) var(--y, 50%), var(--glow), transparent 60%);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-
 .recipe-card:hover {
   transform: translateY(-4px);
   border-color: var(--line-strong);
   box-shadow: 0 16px 40px var(--shadow);
-}
-
-.recipe-card:hover::before {
-  opacity: 1;
 }
 
 .recipe-card img,
@@ -567,16 +548,6 @@ label {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
 }
-
-/* Karten erscheinen nacheinander: Verzoegerung je Position innerhalb einer 9er-Seite */
-.recipe-card:nth-child(9n + 2) { animation-delay: 50ms; }
-.recipe-card:nth-child(9n + 3) { animation-delay: 100ms; }
-.recipe-card:nth-child(9n + 4) { animation-delay: 150ms; }
-.recipe-card:nth-child(9n + 5) { animation-delay: 200ms; }
-.recipe-card:nth-child(9n + 6) { animation-delay: 250ms; }
-.recipe-card:nth-child(9n + 7) { animation-delay: 300ms; }
-.recipe-card:nth-child(9n + 8) { animation-delay: 350ms; }
-.recipe-card:nth-child(9n + 9) { animation-delay: 400ms; }
 
 @keyframes fade-up {
   from {
@@ -733,7 +704,7 @@ label {
   right: 14px;
   z-index: 2;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--panel) 85%, transparent);
+  background: rgba(25, 19, 31, 0.85);
   backdrop-filter: blur(6px);
   color: var(--text);
   font-weight: 700;
@@ -873,7 +844,7 @@ label {
   gap: 0;
 }
 
-.ingredient-list > li {
+.ingredient-list>li {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -988,15 +959,15 @@ label {
   transition: transform 0.25s var(--ease);
 }
 
-.unit-switch input:checked + .switch-track {
+.unit-switch input:checked+.switch-track {
   background: var(--primary);
 }
 
-.unit-switch input:checked + .switch-track::after {
+.unit-switch input:checked+.switch-track::after {
   transform: translateX(18px);
 }
 
-.unit-switch input:focus-visible + .switch-track {
+.unit-switch input:focus-visible+.switch-track {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
 }
@@ -1018,6 +989,7 @@ label {
 
 /* Accessibility: wer im System "weniger Bewegung" eingestellt hat, bekommt keine Animationen */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -1029,7 +1001,8 @@ label {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 640px) {
-  /* Logo und Avatar oben, Nav rutscht per order in eine eigene zweite Zeile */
+
+  /* Titel und Account oben, Nav rutscht per order in eine eigene zweite Zeile */
   .topbar {
     flex-wrap: wrap;
     padding: 12px 16px 0;
@@ -1042,7 +1015,7 @@ label {
     overflow-x: auto;
   }
 
-  .search-row > * {
+  .search-row>* {
     flex: 1 1 100%;
   }
 
