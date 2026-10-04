@@ -1,0 +1,1072 @@
+/* Design-Tokens: das ganze Farbschema haengt an diesen Custom Properties */
+:root {
+  color-scheme: dark;
+  /* Theme "Aubergine & Lavender" */
+  --bg: #110d17;
+  --panel: #19131f;
+  --soft: #221a2b;
+  --text: #f1ecf7;
+  --muted: #a497b3;
+  --line: #2f2539;
+  --line-strong: #44364f;
+  --primary: #b18cff;
+  --primary-dark: #c4a6ff;
+  --on-primary: #1a0f2b;
+  --glow: rgba(177, 140, 255, 0.18);
+  --accent: #7fd8c4;
+  --accent-soft: rgba(127, 216, 196, 0.12);
+  --danger: #e5484d;
+  --danger-dark: #f2555a;
+  --star: #ffc857;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --radius: 14px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Author-Regeln wie display: flex wuerden sonst das hidden-Attribut ueberschreiben */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Serifenschrift nur fuer grosse Ueberschriften, Fliesstext bleibt Inter */
+h1,
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--primary);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Dunkle Schrift auf Orange: deutlich besserer Kontrast als Weiss (WCAG) */
+button {
+  border: 0;
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--on-primary);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.65rem 1.1rem;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s var(--ease), box-shadow 0.2s;
+}
+
+button:hover:not(:disabled) {
+  background: var(--primary-dark);
+  box-shadow: 0 0 0 4px var(--glow);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--soft);
+  color: var(--text);
+  padding: 0.65rem 0.85rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--line-strong);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.ghost-button {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+.ghost-button:hover:not(:disabled) {
+  background: var(--soft);
+  border-color: var(--line-strong);
+  box-shadow: none;
+}
+
+.link-button {
+  background: transparent;
+  color: var(--primary);
+  font-weight: 500;
+  padding: 0;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.link-button:hover:not(:disabled) {
+  background: transparent;
+  color: var(--primary-dark);
+  box-shadow: none;
+}
+
+.secondary-button {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+
+.danger-button {
+  background: var(--danger);
+  color: #ffffff;
+}
+
+.danger-button:hover:not(:disabled) {
+  background: var(--danger-dark);
+  box-shadow: 0 0 0 4px rgba(229, 72, 77, 0.2);
+}
+
+.status {
+  color: var(--muted);
+}
+
+/* ---------- Layout ---------- */
+
+/* Sticky Topbar: halbtransparent mit Unschaerfe, der Inhalt scrollt darunter durch */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 24px;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+}
+
+.topbar h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+/* Nav schiebt sich mit margin-right: auto nach links, Aktionen bleiben rechts */
+.topnav {
+  display: flex;
+  gap: 4px;
+  margin-right: auto;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Account-Button oeffnet ein Menue, der Name steht nicht in der Topbar */
+.user-menu {
+  position: relative;
+}
+
+.account-button[aria-expanded="true"] {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--glow);
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  display: grid;
+  gap: 12px;
+  min-width: 220px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  padding: 14px;
+  animation: fade-in 0.2s ease both;
+}
+
+.account-menu p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.account-menu strong {
+  display: block;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.shell {
+  width: min(1100px, calc(100% - 32px));
+  margin: 32px auto;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.panel h2 {
+  margin-top: 0;
+  font-size: 1.35rem;
+}
+
+.auth-panel {
+  display: grid;
+  gap: 16px;
+  max-width: 420px;
+  margin: 64px auto;
+  padding: 36px;
+}
+
+.auth-panel h2,
+.auth-panel p {
+  margin: 0;
+}
+
+.auth-panel h2 {
+  font-size: 1.6rem;
+}
+
+/* Zwei Klassen schlagen ".auth-panel p" in der Spezifitaet */
+.auth-panel .auth-subtitle {
+  margin-top: -8px;
+  color: var(--muted);
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+/* ---------- Tabs ---------- */
+
+/* Schlanke Links: der aktive Tab bekommt eine orange Linie darunter */
+.tab-button {
+  position: relative;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 500;
+  padding: 8px 12px;
+}
+
+.tab-button::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  bottom: 0;
+  left: 12px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transition: transform 0.25s var(--ease);
+}
+
+.tab-button:hover:not(:disabled) {
+  background: transparent;
+  color: var(--text);
+  box-shadow: none;
+}
+
+.tab-button.active {
+  color: var(--text);
+}
+
+.tab-button.active::after {
+  transform: scaleX(1);
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  margin-bottom: 40px;
+  padding: 24px 0 8px;
+}
+
+.hero h2 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.hero-subtitle {
+  margin: 8px 0 24px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+/* ---------- Suche und Karten ---------- */
+
+.search-form {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.search-row select {
+  width: auto;
+}
+
+#searchInput {
+  flex: 1 1 240px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* Segmented Control: zwei Radio-Buttons, die wie Schalter aussehen */
+.mode-switch {
+  display: inline-flex;
+  justify-self: start;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--soft);
+  padding: 4px;
+}
+
+.mode-switch label {
+  position: relative;
+  display: block;
+  border-radius: 999px;
+  color: var(--text);
+  cursor: pointer;
+  padding: 6px 14px;
+}
+
+/* Radio bleibt klick- und tastaturbedienbar, liegt aber unsichtbar ueber dem Label */
+.mode-switch input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.mode-switch label {
+  transition: background 0.2s, color 0.2s;
+}
+
+.mode-switch label:has(input:checked) {
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 600;
+}
+
+.mode-switch label:has(input:focus-visible) {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Intrinsisch responsives Grid: Spaltenanzahl ergibt sich ohne Media Query */
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+/* Meldungen im Grid ueber alle Spalten statt nur in der ersten */
+.recipe-grid > .status {
+  grid-column: 1 / -1;
+}
+
+.recipe-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--panel);
+  transition: transform 0.3s var(--ease), border-color 0.3s, box-shadow 0.3s;
+  animation: fade-up 0.5s var(--ease) both;
+}
+
+/* Spotlight: Lichtkegel an der Mausposition (--x/--y setzt app.js) */
+.recipe-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(320px circle at var(--x, 50%) var(--y, 50%), var(--glow), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.recipe-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--line-strong);
+  box-shadow: 0 16px 40px var(--shadow);
+}
+
+.recipe-card:hover::before {
+  opacity: 1;
+}
+
+.recipe-card img,
+.image-placeholder {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  transition: transform 0.5s var(--ease);
+}
+
+.recipe-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Bildbereich: overflow hidden haelt den Zoom im Rahmen */
+.card-media {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Verlauf unten im Bild, damit das Badge immer lesbar ist */
+.card-media::after {
+  content: "";
+  position: absolute;
+  inset: 40% 0 0;
+  background: linear-gradient(to top, rgba(17, 13, 23, 0.75), transparent);
+  pointer-events: none;
+}
+
+.time-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1;
+  border-radius: 999px;
+  background: rgba(17, 13, 23, 0.7);
+  backdrop-filter: blur(6px);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 10px;
+}
+
+/* Stretched Link: echter Button im Titel, sein ::after spannt sich ueber die ganze Karte */
+.card-link {
+  background: transparent;
+  color: inherit;
+  font-weight: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.card-link:hover:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+}
+
+.card-link:active:not(:disabled) {
+  transform: none;
+}
+
+.card-link:focus-visible {
+  outline: none;
+}
+
+.recipe-card:has(.card-link:focus-visible) {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Karten erscheinen nacheinander: Verzoegerung je Position innerhalb einer 9er-Seite */
+.recipe-card:nth-child(9n + 2) { animation-delay: 50ms; }
+.recipe-card:nth-child(9n + 3) { animation-delay: 100ms; }
+.recipe-card:nth-child(9n + 4) { animation-delay: 150ms; }
+.recipe-card:nth-child(9n + 5) { animation-delay: 200ms; }
+.recipe-card:nth-child(9n + 6) { animation-delay: 250ms; }
+.recipe-card:nth-child(9n + 7) { animation-delay: 300ms; }
+.recipe-card:nth-child(9n + 8) { animation-delay: 350ms; }
+.recipe-card:nth-child(9n + 9) { animation-delay: 400ms; }
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.image-placeholder {
+  background: linear-gradient(135deg, var(--soft), var(--panel));
+}
+
+/* Kein position hier: sonst wuerde sich .card-link::after nur ueber den Textbereich spannen */
+.recipe-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+}
+
+.recipe-card-body h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.recipe-card-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.diet-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.diet-tag {
+  border: 1px solid rgba(127, 216, 196, 0.3);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 10px;
+}
+
+.show-more-button {
+  display: block;
+  margin: 20px auto 0;
+}
+
+/* ---------- Admin ---------- */
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 12px 10px;
+  text-align: left;
+}
+
+.user-table th {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.user-table tbody tr {
+  transition: background 0.2s;
+}
+
+.user-table tbody tr:hover {
+  background: var(--soft);
+}
+
+.user-table select {
+  width: auto;
+}
+
+.admin-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--soft);
+  padding: 10px 14px;
+}
+
+/* ---------- Modal und Detailansicht ---------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  animation: fade-in 0.25s ease both;
+}
+
+.modal-content {
+  position: relative;
+  width: min(760px, calc(100% - 32px));
+  max-height: 88vh;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  padding: 28px;
+  animation: modal-in 0.35s var(--ease) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel) 85%, transparent);
+  backdrop-filter: blur(6px);
+  color: var(--text);
+  font-weight: 700;
+  padding: 4px 11px;
+}
+
+.modal-close:hover:not(:disabled) {
+  background: var(--line);
+  box-shadow: none;
+}
+
+/* Bild in voller Breite: negativer Margin hebt das Padding der Modal-Box auf */
+.detail-image {
+  display: block;
+  width: calc(100% + 56px);
+  height: 280px;
+  margin: -28px -28px 20px;
+  object-fit: cover;
+}
+
+.detail-header {
+  display: grid;
+  gap: 12px;
+}
+
+.detail-header h2 {
+  margin: 0 40px 0 0;
+  font-size: 1.7rem;
+}
+
+.detail-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detail-chips li {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--soft);
+  font-size: 0.85rem;
+  padding: 4px 12px;
+}
+
+.detail-meta {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.detail-section {
+  margin-top: 20px;
+}
+
+.detail-section h3 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+.user-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--soft);
+  padding: 16px;
+}
+
+.saved-info {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 4px;
+}
+
+.star-button,
+.star-button:hover:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+  color: var(--line-strong);
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.star-button.filled,
+.star-button:hover:not(:disabled) {
+  color: var(--star);
+}
+
+.star-button:hover:not(:disabled) {
+  transform: scale(1.15);
+}
+
+.portion-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.portion-controls input {
+  width: 120px;
+}
+
+.portion-controls select {
+  width: auto;
+  max-width: 220px;
+}
+
+.ingredient-list,
+.nutrition-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Zutaten einspaltig wie auf einem Rezeptzettel: Menge fett, Zeilen durch Linien getrennt */
+.ingredient-list {
+  gap: 0;
+}
+
+.ingredient-list > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.nutrition-list {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.nutrition-list li {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--soft);
+  font-size: 0.9rem;
+  padding: 8px 12px;
+}
+
+.substitute-button {
+  font-size: 0.85rem;
+}
+
+.substitute-box {
+  flex-basis: 100%;
+  border-left: 3px solid var(--accent);
+  padding: 2px 0 2px 12px;
+}
+
+.substitute-title {
+  margin: 0 0 4px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.substitute-box ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.substitute-box li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+}
+
+.substitute-box small {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ---------- Umschalter Metric / US ---------- */
+
+.section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.section-header h3 {
+  margin: 0;
+}
+
+.unit-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* Checkbox bleibt bedienbar, liegt aber unsichtbar ueber dem Schalter */
+.unit-switch input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.switch-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  transition: background 0.2s;
+}
+
+.switch-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 0.25s var(--ease);
+}
+
+.unit-switch input:checked + .switch-track {
+  background: var(--primary);
+}
+
+.unit-switch input:checked + .switch-track::after {
+  transform: translateX(18px);
+}
+
+.unit-switch input:focus-visible + .switch-track {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.detail-meta a {
+  color: var(--primary);
+}
+
+.site-footer {
+  padding: 8px 16px 24px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.site-footer a {
+  color: inherit;
+}
+
+/* Accessibility: wer im System "weniger Bewegung" eingestellt hat, bekommt keine Animationen */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  /* Logo und Avatar oben, Nav rutscht per order in eine eigene zweite Zeile */
+  .topbar {
+    flex-wrap: wrap;
+    padding: 12px 16px 0;
+  }
+
+  .topnav {
+    order: 3;
+    width: 100%;
+    margin: 0 -12px;
+    overflow-x: auto;
+  }
+
+  .search-row > * {
+    flex: 1 1 100%;
+  }
+
+  .mode-switch {
+    justify-self: stretch;
+  }
+
+  .mode-switch label {
+    flex: 1;
+    text-align: center;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .detail-image {
+    width: calc(100% + 40px);
+    height: 200px;
+    margin: -20px -20px 16px;
+  }
+
+  .auth-panel {
+    margin: 32px auto;
+    padding: 24px;
+  }
+}
