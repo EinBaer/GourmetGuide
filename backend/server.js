@@ -11,7 +11,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const recipeRoutes = require('./src/routes/recipeRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 
-//Express-Server
+// Express-Server
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -25,9 +25,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/admin', adminRoutes);
 
-app.get('/api/status', (req, res) => {
-  return res.json({ status: 'GourmetGuide backend is running.' });
-});
 
 // Unbekannte API-Routen liefern JSON statt HTML
 app.use('/api', (req, res) => {
