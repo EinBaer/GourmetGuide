@@ -5,7 +5,7 @@ const MAX_RESULTS = 27;
 const NUTRIENTS = ['Calories', 'Protein', 'Fat', 'Carbohydrates'];
 
 // Cache spart API-Punkte (Free Tier: 50 Punkte pro Tag)
-// Spoonacular erlaubt Caching nur fuer maximal 1 Stunde
+// gelten 1 Stunde, danach wird neu von der API geladen
 const CACHE_DURATION_MS = 60 * 60 * 1000;
 const cache = new Map();
 
@@ -22,19 +22,18 @@ const writeCache = (key, data) => {
 
 const requestSpoonacular = async (endpoint, params) => {
   const url = new URL(`${SPOONACULAR_BASE}${endpoint}`);
-  Object.entries({ ...params, apiKey: process.env.SPOONACULAR_API_KEY })
-    .forEach(([key, value]) => url.searchParams.set(key, value));
+  url.search = new URLSearchParams({ ...params, apiKey: process.env.SPOONACULAR_API_KEY });
 
   const response = await fetch(url);
   if (response.status === 404) return null;
   if (!response.ok) {
     // Status merken, damit die Route z.B. das Tageslimit (402) erkennen kann
-    const error = new Error(`Spoonacular antwortete mit Status ${response.status}`);
+    const error = new Error(`Spoonacular responded with status ${response.status}`);
     error.status = response.status;
     throw error;
   }
 
-  console.log('Spoonacular Punkte heute verbraucht:', response.headers.get('x-api-quota-used'));
+  console.log('Spoonacular points used today:', response.headers.get('x-api-quota-used'));
   return response.json();
 };
 
@@ -72,40 +71,23 @@ const searchRecipes = async ({ query, ingredients, cuisine, diet, maxReadyTime }
   if (cached) return cached;
 
   const data = await requestSpoonacular('/recipes/complexSearch', params);
-  return writeCache(cacheKey, (data?.results || []).map((recipe) => ({
-    ...toRecipeModel(recipe),
-    // Nur im Zutaten-Modus vorhanden: wie viele eigene Zutaten verwendet werden bzw. fehlen
-    ...(ingredients && {
-      usedIngredientCount: recipe.usedIngredientCount || 0,
-      missedIngredientCount: recipe.missedIngredientCount || 0
-    })
-  })));
+  const results = (data?.results || []).map((recipe) => {
+    const result = toRecipeModel(recipe);
+    // Nur im Zutaten-Modus: wie viele eigene Zutaten verwendet werden bzw. fehlen
+    if (ingredients) {
+      result.usedIngredientCount = recipe.usedIngredientCount || 0;
+      result.missedIngredientCount = recipe.missedIngredientCount || 0;
+    }
+    return result;
+  });
+  return writeCache(cacheKey, results);
 };
 
-// Spoonacular schreibt Einheiten uneinheitlich (Tbsps, tablespoons, ...): auf eine Schreibweise bringen
-const UNIT_NAMES = {
-  tbsp: 'tbsp', tbsps: 'tbsp', tablespoon: 'tbsp', tablespoons: 'tbsp',
-  tsp: 'tsp', tsps: 'tsp', teaspoon: 'tsp', teaspoons: 'tsp',
-  cup: 'cup', cups: 'cup'
-};
-// Loeffel und Cups sind keine metrischen Einheiten: im Metric-Modus in ml bzw. g umrechnen
-const TBSP_PER_UNIT = { tbsp: 1, tsp: 1 / 3, cup: 16 };
-const ML_PER_TBSP = 15;
-// Feste Zutaten wiegt man in Gramm statt ml (Gramm pro Essloeffel)
-const GRAMS_PER_TBSP = { butter: 14, sugar: 12.5, flour: 8, salt: 18 };
-
-const toMeasure = (measure, ing, isMetric) => {
-  // Fallback auf die Originalangabe, falls eine Masseinheit fehlt
-  const amount = measure?.amount ?? ing.amount;
-  const rawUnit = ((measure ? measure.unitShort : ing.unit) || '').toLowerCase();
-  const unit = UNIT_NAMES[rawUnit] || rawUnit;
-  if (isMetric && TBSP_PER_UNIT[unit]) {
-    const tbsp = amount * TBSP_PER_UNIT[unit];
-    const solid = Object.keys(GRAMS_PER_TBSP).find((name) => ing.name.toLowerCase().includes(name));
-    return solid ? { amount: tbsp * GRAMS_PER_TBSP[solid], unit: 'g' } : { amount: tbsp * ML_PER_TBSP, unit: 'ml' };
-  }
-  return { amount, unit };
-};
+// Spoonacular liefert jede Menge metrisch und amerikanisch, Fallback auf die Originalangabe
+const toMeasure = (measure, ing) => ({
+  amount: measure?.amount ?? ing.amount,
+  unit: measure?.unitShort ?? ing.unit ?? ''
+});
 
 const getRecipeDetails = async (recipeId) => {
   const cacheKey = `details:${recipeId}`;
@@ -124,8 +106,8 @@ const getRecipeDetails = async (recipeId) => {
     // Spoonacular liefert jede Menge metrisch und amerikanisch: beide fuer den Umschalter speichern
     ingredients: (recipe.extendedIngredients || []).map((ing) => ({
       name: ing.name,
-      metric: toMeasure(ing.measures?.metric, ing, true),
-      us: toMeasure(ing.measures?.us, ing, false)
+      metric: toMeasure(ing.measures?.metric, ing),
+      us: toMeasure(ing.measures?.us, ing)
     })),
     // Naehrwerte pro Portion
     nutrition: nutrients
