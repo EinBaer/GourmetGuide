@@ -80,7 +80,6 @@ router.delete('/users/:id', async (req, res) => {
 
   try {
     const users = await loadUserDatabase();
-
     const target = users.find((entry) => entry.id === req.params.id);
 
     if (!target) {
@@ -120,7 +119,7 @@ router.post('/featured', async (req, res) => {
       return res.status(409).json({ error: 'This recipe is already featured.' });
     }
 
-    // Laut Konzept: Spoonacular-Daten holen (aus dem Cache, falls schon geladen)
+    // Rezeptdaten von Spoonacular holen (aus dem Cache, falls schon geladen)
     const details = await getRecipeDetails(recipeId);
     if (!details) {
       return res.status(404).json({ error: 'Recipe not found.' });
