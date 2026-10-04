@@ -18,7 +18,7 @@ GourmetGuide sucht Rezepte über die externe [Spoonacular Food API](https://spoo
 | npm | wird mit Node.js installiert |
 | Spoonacular API Key | kostenlos, siehe unten |
 
-Die Pakete werden mit `npm install` automatisch installiert (siehe `backend/package.json`): express 4.22, cors 2.8, dotenv 18, jsonwebtoken 9, bcryptjs 3.
+Die Pakete werden mit `npm install` automatisch installiert (siehe `backend/package.json`): express, dotenv, jsonwebtoken, bcryptjs.
 
 ## Installation
 
@@ -43,7 +43,6 @@ cp .env.example .env
 | `JWT_SECRET` | ✓ | Beliebiger langer, geheimer Text zum Signieren der Login-Tokens |
 | `SPOONACULAR_API_KEY` | ✓ | API Key von Spoonacular |
 | `PORT` | | Port des Servers, Standard `3000` |
-| `FRONTEND_URL` | | Erlaubter CORS-Origin, Standard `http://localhost:<PORT>` |
 | `OWNER_USERNAME` | | Haupt-Admin, den andere Admins weder degradieren noch löschen können |
 
 Fehlt eine Pflichtvariable, bricht der Server beim Start mit einer klaren Fehlermeldung ab.
@@ -53,7 +52,7 @@ Fehlt eine Pflichtvariable, bricht der Server beim Start mit einer klaren Fehler
 1. Kostenlosen Account auf [spoonacular.com/food-api/console](https://spoonacular.com/food-api/console) anlegen.
 2. Unter **Profile → API Key** den Key kopieren und als `SPOONACULAR_API_KEY` eintragen.
 
-Der kostenlose Tarif hat ein tägliches Punkte-Limit. Die App spart Punkte, indem sie pro Suche 27 Rezepte auf einmal lädt und Antworten 1 Stunde zwischenspeichert. Ist das Limit erreicht, zeigt sie eine verständliche Meldung, Kochbuch und Empfehlungen funktionieren weiter.
+Der kostenlose Tarif ist auf 50 Punkte pro Tag begrenzt. Die App spart Punkte, indem sie pro Suche 27 Rezepte auf einmal lädt ("Show more" kostet nichts) und API-Antworten 1 Stunde zwischenspeichert. Der aktuelle Verbrauch wird im Server-Terminal angezeigt. Ist das Limit erreicht, zeigt die App eine verständliche Meldung, Kochbuch und Chef's Picks funktionieren weiter.
 
 ## Build
 
