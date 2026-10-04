@@ -89,7 +89,8 @@ router.post('/login', async (req, res) => {
     const user = users.find((entry) => entry.username === username.trim().toLowerCase());
 
     // Gleiche Meldung bei falschem User und falschem Passwort (keine User-Enumeration)
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    const passwordMatches = user && await bcrypt.compare(password, user.password);
+    if (!passwordMatches) {
       return res.status(401).json({ error: 'Wrong username or password.' });
     }
 
