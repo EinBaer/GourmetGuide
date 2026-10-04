@@ -1,165 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="GourmetGuide - discover recipes and build your personal cookbook">
-    <title>GourmetGuide</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Inter:wght@400;500;600&display=swap">
-    <link rel="stylesheet" href="style.css">
-    <script src="app.js" defer></script>
-  </head>
-  <body>
-    <header class="topbar">
-      <h1>GourmetGuide</h1>
-      <nav id="tabNav" class="topnav" aria-label="Sections">
-        <button class="tab-button active" type="button" data-tab="search">Discover</button>
-        <button class="tab-button" type="button" data-tab="cookbook" hidden>My Cookbook</button>
-        <button class="tab-button" type="button" data-tab="admin" hidden>Admin</button>
-      </nav>
-      <div class="topbar-actions">
-        <button id="loginButton" class="ghost-button" type="button">Log in</button>
-        <div id="userMenu" class="user-menu" hidden>
-          <button id="accountButton" class="ghost-button account-button" type="button" aria-haspopup="true" aria-expanded="false">Account</button>
-          <div id="accountMenu" class="account-menu" hidden>
-            <p>Signed in as <strong id="userName"></strong></p>
-            <button id="logoutButton" class="ghost-button" type="button">Log out</button>
-          </div>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="GourmetGuide - discover recipes and build your personal cookbook">
+  <title>GourmetGuide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <header class="topbar">
+    <h1>GourmetGuide</h1>
+    <nav id="tabNav" class="topnav" aria-label="Sections">
+      <button class="tab-button active" type="button" data-tab="search">Discover</button>
+      <button class="tab-button" type="button" data-tab="cookbook" hidden>My Cookbook</button>
+      <button class="tab-button" type="button" data-tab="admin" hidden>Admin</button>
+    </nav>
+    <div class="topbar-actions">
+      <button id="loginButton" class="ghost-button" type="button">Log in</button>
+      <div id="userMenu" class="user-menu" hidden>
+        <button id="accountButton" class="ghost-button account-button" type="button" aria-haspopup="true"
+          aria-expanded="false">Account</button>
+        <div id="accountMenu" class="account-menu" hidden>
+          <p>Signed in as <strong id="userName"></strong></p>
+          <button id="logoutButton" class="ghost-button" type="button">Log out</button>
         </div>
-      </div>
-    </header>
-
-    <main class="shell">
-      <section id="authPanel" class="panel auth-panel" aria-labelledby="authTitle" hidden>
-        <h2 id="authTitle">Log in</h2>
-        <p class="auth-subtitle">Save recipes, rate them and build your cookbook.</p>
-        <form id="authForm" class="form">
-          <label id="nameLabel" hidden>
-            Name
-            <input id="nameInput" type="text" autocomplete="name" maxlength="50">
-          </label>
-          <label>
-            Username
-            <input id="usernameInput" type="text" autocomplete="username" maxlength="50" required>
-          </label>
-          <label>
-            Password
-            <input id="passwordInput" type="password" autocomplete="current-password" required>
-          </label>
-          <button id="authSubmitButton" type="submit">Log in</button>
-        </form>
-        <p id="authMessage" class="status" role="alert"></p>
-        <button id="authSwitch" class="link-button" type="button">No account yet? Sign up</button>
-        <button id="guestButton" class="link-button" type="button">Continue as guest</button>
-      </section>
-
-      <div id="dashboard">
-        <div id="searchTab">
-          <section class="hero" aria-labelledby="searchTitle">
-            <h2 id="searchTitle">What's cooking today?</h2>
-            <p class="hero-subtitle">Search thousands of recipes or use what's already in your fridge.</p>
-            <form id="searchForm" class="search-form">
-              <fieldset class="mode-switch">
-                <legend class="visually-hidden">Search mode</legend>
-                <label><input type="radio" name="searchMode" value="dish" checked> Search a dish</label>
-                <label><input type="radio" name="searchMode" value="ingredients"> What's in my fridge?</label>
-              </fieldset>
-              <div class="search-row">
-                <input id="searchInput" type="search" placeholder="e.g. lasagna, curry, pancakes" aria-label="Search term" maxlength="200" autocomplete="off" required>
-                <select id="cuisineSelect" aria-label="Cuisine">
-                  <option value="">Around the world</option>
-                  <option value="italian">Italian</option>
-                  <option value="french">French</option>
-                  <option value="greek">Greek</option>
-                  <option value="spanish">Spanish</option>
-                  <option value="german">German</option>
-                  <option value="mediterranean">Mediterranean</option>
-                  <option value="middle eastern">Middle Eastern</option>
-                  <option value="indian">Indian</option>
-                  <option value="chinese">Chinese</option>
-                  <option value="japanese">Japanese</option>
-                  <option value="thai">Thai</option>
-                  <option value="korean">Korean</option>
-                  <option value="vietnamese">Vietnamese</option>
-                  <option value="mexican">Mexican</option>
-                  <option value="latin american">Latin American</option>
-                  <option value="american">American</option>
-                </select>
-                <select id="dietSelect" aria-label="Diet">
-                  <option value="">Omnivore</option>
-                  <option value="vegetarian">Vegetarian</option>
-                  <option value="vegan">Vegan</option>
-                  <option value="pescetarian">Pescetarian</option>
-                  <option value="gluten free">Gluten-free</option>
-                  <option value="ketogenic">Keto</option>
-                  <option value="paleo">Paleo</option>
-                </select>
-                <select id="timeSelect" aria-label="Maximum cooking time">
-                  <option value="">Any time</option>
-                  <option value="10">up to 10 min</option>
-                  <option value="20">up to 20 min</option>
-                  <option value="30">up to 30 min</option>
-                  <option value="40">up to 40 min</option>
-                  <option value="50">up to 50 min</option>
-                  <option value="60">up to 1 hour</option>
-                  <option value="90">up to 1.5 hours</option>
-                  <option value="120">up to 2 hours</option>
-                </select>
-                <button type="submit">Search</button>
-              </div>
-              <p id="searchHint" class="hint">Tip: type a dish in English, e.g. "risotto".</p>
-            </form>
-            <div id="searchResults" class="recipe-grid" aria-live="polite"></div>
-            <button id="showMoreButton" class="ghost-button show-more-button" type="button" hidden>Show more recipes</button>
-          </section>
-
-          <section id="featuredSection" class="panel" aria-labelledby="featuredTitle" hidden>
-            <h2 id="featuredTitle">Chef's Picks</h2>
-            <div id="featuredList" class="recipe-grid"></div>
-          </section>
-        </div>
-
-        <section id="cookbookTab" class="panel" aria-labelledby="cookbookTitle" hidden>
-          <h2 id="cookbookTitle">My Cookbook</h2>
-          <div id="cookbookList" class="recipe-grid"></div>
-          <p id="cookbookEmpty" class="status" hidden>Your cookbook is empty. Open a recipe and save it here.</p>
-        </section>
-
-        <section id="adminTab" class="panel" aria-labelledby="adminTitle" hidden>
-          <h2 id="adminTitle">Administration</h2>
-          <h3>Users</h3>
-          <div class="table-wrapper">
-            <table class="user-table">
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col">Username</th>
-                  <th scope="col">Role</th>
-                  <th scope="col">Joined</th>
-                  <th scope="col">Action</th>
-                </tr>
-              </thead>
-              <tbody id="userTableBody"></tbody>
-            </table>
-          </div>
-          <h3>Chef's Picks</h3>
-          <p class="status">To feature a new recipe, open it and click "Add to Chef's Picks".</p>
-          <ul id="adminFeaturedList" class="admin-list"></ul>
-        </section>
-      </div>
-    </main>
-
-    <footer class="site-footer">
-      Recipe data provided by <a href="https://spoonacular.com/food-api" target="_blank" rel="noopener noreferrer">Spoonacular</a>
-    </footer>
-
-    <div id="recipeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
-      <div class="modal-content">
-        <button id="modalClose" class="modal-close" type="button" aria-label="Close">X</button>
-        <div id="modalBody"></div>
       </div>
     </div>
-  </body>
+  </header>
+
+  <main class="shell">
+    <section id="authPanel" class="panel auth-panel" aria-labelledby="authTitle" hidden>
+      <h2 id="authTitle">Log in</h2>
+      <p class="auth-subtitle">Save recipes, rate them and build your cookbook.</p>
+      <form id="authForm" class="form">
+        <label id="nameLabel" hidden>
+          Name
+          <input id="nameInput" type="text" autocomplete="name" maxlength="50">
+        </label>
+        <label>
+          Username
+          <input id="usernameInput" type="text" autocomplete="username" maxlength="50" required>
+        </label>
+        <label>
+          Password
+          <input id="passwordInput" type="password" autocomplete="current-password" required>
+        </label>
+        <button id="authSubmitButton" type="submit">Log in</button>
+      </form>
+      <p id="authMessage" class="status" role="alert"></p>
+      <button id="authSwitch" class="link-button" type="button">No account yet? Sign up</button>
+      <button id="guestButton" class="link-button" type="button">Continue as guest</button>
+    </section>
+
+    <div id="dashboard">
+      <div id="searchTab">
+        <section class="hero" aria-labelledby="searchTitle">
+          <h2 id="searchTitle">What's cooking today?</h2>
+          <p class="hero-subtitle">Search thousands of recipes or use what's already in your fridge.</p>
+          <form id="searchForm" class="search-form">
+            <fieldset class="mode-switch">
+              <legend class="visually-hidden">Search mode</legend>
+              <label><input type="radio" name="searchMode" value="dish" checked> Search a dish</label>
+              <label><input type="radio" name="searchMode" value="ingredients"> What's in my fridge?</label>
+            </fieldset>
+            <div class="search-row">
+              <input id="searchInput" type="search" placeholder="e.g. lasagna, curry, pancakes" aria-label="Search term"
+                maxlength="200" autocomplete="off" required>
+              <select id="cuisineSelect" aria-label="Cuisine">
+                <option value="">Around the world</option>
+                <option value="italian">Italian</option>
+                <option value="french">French</option>
+                <option value="greek">Greek</option>
+                <option value="spanish">Spanish</option>
+                <option value="german">German</option>
+                <option value="mediterranean">Mediterranean</option>
+                <option value="middle eastern">Middle Eastern</option>
+                <option value="indian">Indian</option>
+                <option value="chinese">Chinese</option>
+                <option value="japanese">Japanese</option>
+                <option value="thai">Thai</option>
+                <option value="korean">Korean</option>
+                <option value="vietnamese">Vietnamese</option>
+                <option value="mexican">Mexican</option>
+                <option value="latin american">Latin American</option>
+                <option value="american">American</option>
+              </select>
+              <select id="dietSelect" aria-label="Diet">
+                <option value="">Omnivore</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="pescetarian">Pescetarian</option>
+                <option value="gluten free">Gluten-free</option>
+                <option value="ketogenic">Keto</option>
+                <option value="paleo">Paleo</option>
+              </select>
+              <select id="timeSelect" aria-label="Maximum cooking time">
+                <option value="">Any time</option>
+                <option value="10">up to 10 min</option>
+                <option value="20">up to 20 min</option>
+                <option value="30">up to 30 min</option>
+                <option value="40">up to 40 min</option>
+                <option value="50">up to 50 min</option>
+                <option value="60">up to 1 hour</option>
+                <option value="90">up to 1.5 hours</option>
+                <option value="120">up to 2 hours</option>
+              </select>
+              <button type="submit">Search</button>
+            </div>
+            <p id="searchHint" class="hint">Tip: type a dish in English, e.g. "risotto".</p>
+          </form>
+          <div id="searchResults" class="recipe-grid" aria-live="polite"></div>
+          <button id="showMoreButton" class="ghost-button show-more-button" type="button" hidden>Show more
+            recipes</button>
+        </section>
+
+        <section id="featuredSection" class="panel" aria-labelledby="featuredTitle" hidden>
+          <h2 id="featuredTitle">Chef's Picks</h2>
+          <div id="featuredList" class="recipe-grid"></div>
+        </section>
+      </div>
+
+      <section id="cookbookTab" class="panel" aria-labelledby="cookbookTitle" hidden>
+        <h2 id="cookbookTitle">My Cookbook</h2>
+        <div id="cookbookList" class="recipe-grid"></div>
+        <p id="cookbookEmpty" class="status" hidden>Your cookbook is empty. Open a recipe and save it here.</p>
+      </section>
+
+      <section id="adminTab" class="panel" aria-labelledby="adminTitle" hidden>
+        <h2 id="adminTitle">Administration</h2>
+        <h3>Users</h3>
+        <div class="table-wrapper">
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Username</th>
+                <th scope="col">Role</th>
+                <th scope="col">Joined</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+        <h3>Chef's Picks</h3>
+        <p class="status">To feature a new recipe, open it and click "Add to Chef's Picks".</p>
+        <ul id="adminFeaturedList" class="admin-list"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Recipe data provided by <a href="https://spoonacular.com/food-api" target="_blank"
+      rel="noopener noreferrer">Spoonacular</a>
+  </footer>
+
+  <div id="recipeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal-content">
+      <button id="modalClose" class="modal-close" type="button" aria-label="Close">X</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+</body>
+
 </html>
